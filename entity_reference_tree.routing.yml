@@ -1,0 +1,9 @@
+entity_reference_tree.widget_form:
+  path: '/admin/entity_reference_tree/search/{field_id}/{vocabulary}'
+  defaults:
+    _title: 'Entity Reference Search'
+    _controller: '\Drupal\entity_reference_tree\Controller\EntityReferenceTreeController::openSearchForm'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
