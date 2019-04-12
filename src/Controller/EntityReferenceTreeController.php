@@ -47,11 +47,11 @@ class  EntityReferenceTreeController extends ControllerBase {
   /**
    * Callback for opening the modal form.
    */
-  public function openSearchForm($field_id, $vocabulary) {
+  public function openSearchForm(string $field_id, string $bundle, string $entity_type) {
     $response = new AjaxResponse();
     
     // Get the modal form using the form builder.
-    $modal_form = $this->formBuilder->getForm('Drupal\entity_reference_tree\Form\SearchForm');
+    $modal_form = $this->formBuilder->getForm('Drupal\entity_reference_tree\Form\SearchForm', $field_id, $bundle, $entity_type);
     
     // Add an AJAX command to open a modal dialog with the form as the content.
     $response->addCommand(new OpenModalDialogCommand('My Modal Form', $modal_form, ['width' => '800']));

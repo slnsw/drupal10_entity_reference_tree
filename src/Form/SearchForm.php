@@ -7,13 +7,27 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\entity_reference_tree\Tree\TreeBuilderInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
 /**
  * ModalForm class.
+ * 
+ * To properly inject services, override create() and use the setters provided
+ * by the traits to inject the needed services.
+ *
+ * @code
+ * public static function create($container) {
+ *   $form = new static();
+ *   // In this example we only need string translation so we use the
+ *   // setStringTranslation() method provided by StringTranslationTrait.
+ *   $form->setStringTranslation($container->get('string_translation'));
+ *   return $form;
+ * }
+ * @endcode
  */
 class SearchForm extends FormBase {
-  
   /**
    * {@inheritdoc}
    */
@@ -24,7 +38,29 @@ class SearchForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $options = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $field_id = [], $bundles = [], $entity_type= '') {
+    $bundlesAry = explode(',', $bundles);
+    // Entitys array.
+    $entityAry = [];
+    $entityTrees = [];
+    
+    if (\Drupal::hasService('entity_reference_' . $entity_type . '_tree_builder')) {
+      $treeBuilder = \Drupal::service('entity_reference_' . $entity_type . '_tree_builder');
+    }
+    else {
+      return [];
+    }
+    
+    foreach ($bundlesAry as $bundle_id) {
+      $entityTrees[] = $treeBuilder->loadTree($entity_type, $bundle_id);
+    }
+    
+    foreach ($entityTrees as $tree) {
+      foreach ($tree as $entity) {
+        $entityAry[$entity->tid] = $entity->name;
+      }
+    }
+    
     $form['#prefix'] = '<div id="entity_reference_tree_wrapper">';
     $form['#suffix'] = '</div>';
     

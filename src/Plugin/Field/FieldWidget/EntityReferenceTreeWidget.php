@@ -37,6 +37,7 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
     }
 
     $str_target = implode(',', $arr_target);
+    $str_target_type = $arr_element['target_id']['#target_type'];
 
     $arr_element['target_id']['#tags'] = TRUE;
     $arr_element['target_id']['#default_value'] = $items->referencedEntities();
@@ -44,7 +45,7 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
     $arr_element['dialog_link'] =  [
         '#type' => 'link',
         '#title' => $this->t('Entity tree'),
-        '#url' => Url::fromRoute('entity_reference_tree.widget_form',['field_id' => $items->getName(), 'vocabulary' => $str_target]),
+        '#url' => Url::fromRoute('entity_reference_tree.widget_form',['field_id' => $items->getName(), 'bundle' => $str_target, 'entity_type' => $str_target_type]),
         '#attributes' => [
             'class' => [
                 'use-ajax',
@@ -55,12 +56,4 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
 
     return $arr_element;
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
-    return $values['target_id'];
-  }
-
 }
