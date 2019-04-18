@@ -1,7 +1,6 @@
 <?php
 namespace Drupal\entity_reference_tree\Tree;
 
-use Drupal\Core\Entity\EntityInterface;
 
 
 /**
@@ -25,20 +24,43 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
    * @return array
    *   All entities in the entity bundle.
    */
-  public function loadTree(string $entityType, string $bundleID) {
-    return \Drupal::entityTypeManager()->getStorage($entityType)->loadTree($bundleID);
+  public function loadTree(string $entityType, string $bundleID, int $parent = 0, int $max_depth = NULL) {
+    return \Drupal::entityTypeManager()->getStorage($entityType)->loadTree($bundleID, $parent, $max_depth);
   }
   
   /**
    * Create a tree node.
    *
-   * @param EntityInterface $entity
+   * @param object $entity
    *   The entity for the tree node.
    *
    * @return array
    *   The tree node for the entity.
    */
-  public function createTreeNode(EntityInterface $entity) {
+  public function createTreeNode(object $entity) {
+    $parent = $entity->parents[0];
     
+    if ($parent === '0') {
+      $parent = '#';
+    }
+    
+    return [
+        'id' => $entity->tid,  // required
+        'parent' => $parent, // required
+        'text' => $entity->name, // node text
+    ];
+  }
+  
+  /**
+   * Get the ID of a tree node.
+   *
+   * @param object $entity
+   *   The entity for the tree node.
+   *
+   * @return string|int|null
+   *   The id of the tree node for the entity.
+   */
+  public function getNodeID(object $entity) {
+    return $entity->tid;
   }
 }

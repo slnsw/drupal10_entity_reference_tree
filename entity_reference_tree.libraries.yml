@@ -3,3 +3,23 @@ widget:
   css:
     theme:
       css/entity-reference-tree.css: {}
+      
+jstree:
+  version: 3.3.7
+  css:
+    theme:
+      css/jstree/themes/default/style.min.css: { minified: true }
+  
+  js:
+    js/jstree/jstree.min.js: { minified: true }
+
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
+    
+entity_tree:
+  js:
+    js/entity_reference_tree.js: {}
+  
+  dependencies:
+    - entity_reference_tree/jstree

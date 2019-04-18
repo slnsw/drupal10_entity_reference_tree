@@ -7,3 +7,13 @@ entity_reference_tree.widget_form:
     _permission: 'administer site configuration'
   options:
     _admin_route: TRUE
+    
+#entity_reference_tree.json:
+#  path: '/admin/entity_reference_tree/json/{entity_type}/{bundles}'
+#  defaults:
+#    _title: 'Entity Reference Search'
+#    _controller: '\Drupal\entity_reference_tree\Controller\EntityReferenceTreeController::treeJson'
+#  requirements:
+#    _permission: 'administer site configuration'
+#  options:
+#    _admin_route: TRUE

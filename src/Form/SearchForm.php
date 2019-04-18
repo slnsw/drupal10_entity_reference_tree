@@ -44,10 +44,12 @@ class SearchForm extends FormBase {
     $entityAry = [];
     $entityTrees = [];
     
+    // Instance a entity tree builder for this entity type if it exists.
     if (\Drupal::hasService('entity_reference_' . $entity_type . '_tree_builder')) {
       $treeBuilder = \Drupal::service('entity_reference_' . $entity_type . '_tree_builder');
     }
     else {
+      // Todo: A basic entity tree builder.
       return [];
     }
     
@@ -57,12 +59,14 @@ class SearchForm extends FormBase {
     
     foreach ($entityTrees as $tree) {
       foreach ($tree as $entity) {
-        $entityAry[$entity->tid] = $entity->name;
+        // Create tree node for each entity.
+        // Store them into an array passed to JS.
+        // An array in JavaScript is indexed list.
+        // JavaScript's array indices are always sequential
+        // and start from 0.
+        $entityAry[] = $treeBuilder->createTreeNode($entity);
       }
     }
-    
-    $form['#prefix'] = '<div id="entity_reference_tree_wrapper">';
-    $form['#suffix'] = '</div>';
     
     // The status messages that will contain any form errors.
     $form['status_messages'] = [
@@ -70,11 +74,26 @@ class SearchForm extends FormBase {
         '#weight' => -10,
     ];
     
-    // A required checkbox field.
-    $form['our_checkbox'] = [
-        '#type' => 'checkbox',
-        '#title' => $this->t('I Agree: modal forms are awesome!'),
-        '#required' => TRUE,
+    $form['tree_search'] = [
+        '#type' => 'textfield',
+        '#title' => $this
+        ->t('Search'),
+        '#size' => 60,
+        '#attributes' => [
+            'id' => [
+                'entity-reference-tree-search',
+            ],
+        ],
+    ];
+    
+    $form['tree_container'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#attributes' => [
+            'id' => [
+                'entity-reference-tree-wrapper',
+            ],
+        ],
     ];
     
     $form['actions'] = array('#type' => 'actions');
@@ -92,7 +111,12 @@ class SearchForm extends FormBase {
         ],
     ];
     
-    $form['#attached']['library'][] = 'core/drupal.dialog.ajax';
+    $form['#attached']['library'][] = 'entity_reference_tree/jstree';
+    $form['#attached']['library'][] = 'entity_reference_tree/entity_tree';
+    // Pass data to js file.
+    $form['#attached']['drupalSettings'] = [
+        'tree_data' => $entityAry,
+    ];
     
     return $form;
   }
