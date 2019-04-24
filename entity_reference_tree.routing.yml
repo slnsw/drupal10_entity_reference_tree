@@ -1,10 +1,10 @@
 entity_reference_tree.widget_form:
-  path: '/admin/entity_reference_tree/search/{field_id}/{bundle}/{entity_type}'
+  path: '/admin/entity_reference_tree/search/{field_edit_id}/{bundle}/{entity_type}/{selected}'
   defaults:
     _title: 'Entity Reference Search'
     _controller: '\Drupal\entity_reference_tree\Controller\EntityReferenceTreeController::openSearchForm'
   requirements:
-    _permission: 'administer site configuration'
+    _access: 'TRUE'
   options:
     _admin_route: TRUE
     

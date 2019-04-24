@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\entity_reference_tree\Tree;
 
 
@@ -28,11 +29,14 @@ interface TreeBuilderInterface {
    *
    * @param object $entity
    *   The entity for the tree node.
+   *   
+   * @param array $selected
+   *   A anrray for all selected nodes.
    *
    * @return array
    *   The tree node for the entity.
    */
-  public function createTreeNode(object $entity);
+  public function createTreeNode(object $entity, array $selected);
   
   /**
    * Get the ID of a tree node.

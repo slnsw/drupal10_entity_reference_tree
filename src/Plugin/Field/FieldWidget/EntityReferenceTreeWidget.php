@@ -16,6 +16,7 @@ use Drupal\Core\Field\Plugin\Field\FieldWidget\EntityReferenceAutocompleteWidget
  *   field_types = {
  *     "entity_reference",
  *   },
+ *   multiple_values = TRUE
  * )
  */
 class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
@@ -32,20 +33,22 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
 
     $arr_target = $arr_element['target_id']['#selection_settings']['target_bundles'];
 
-    foreach ($arr_target as $vid) {
-      $form['#attached']['drupalSettings']['initDynatree'][] = $vid;
-    }
+   /*  foreach ($arr_target as $vid) {
+      $form['#attached']['drupalSettings']['initEntitySelected'][] = $vid;
+    } */
 
     $str_target = implode(',', $arr_target);
     $str_target_type = $arr_element['target_id']['#target_type'];
+    $edit_id = 'edit-' . str_replace('_', '-', $items->getName()) . '-target-id';
 
+    $arr_element['target_id']['#id'] = $edit_id;
     $arr_element['target_id']['#tags'] = TRUE;
     $arr_element['target_id']['#default_value'] = $items->referencedEntities();
     
     $arr_element['dialog_link'] =  [
         '#type' => 'link',
         '#title' => $this->t('Entity tree'),
-        '#url' => Url::fromRoute('entity_reference_tree.widget_form',['field_id' => $items->getName(), 'bundle' => $str_target, 'entity_type' => $str_target_type]),
+        '#url' => Url::fromRoute('entity_reference_tree.widget_form',['field_edit_id' => $edit_id, 'bundle' => $str_target, 'entity_type' => $str_target_type, 'selected' => $items->getString()]),
         '#attributes' => [
             'class' => [
                 'use-ajax',
@@ -55,5 +58,12 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
     ];
 
     return $arr_element;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    return $values['target_id'];
   }
 }

@@ -7,8 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
-use Drupal\entity_reference_tree\Tree\TreeBuilderInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Ajax\SettingsCommand;
 
 
 /**
@@ -38,8 +37,9 @@ class SearchForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $field_id = [], $bundles = [], $entity_type= '') {
+  public function buildForm(array $form, FormStateInterface $form_state, $field_edit_id = [], $bundles = [], $entity_type= '', $selected = '') {
     $bundlesAry = explode(',', $bundles);
+    $selectedAry = explode(',', $selected);
     // Entitys array.
     $entityAry = [];
     $entityTrees = [];
@@ -53,70 +53,108 @@ class SearchForm extends FormBase {
       return [];
     }
     
-    foreach ($bundlesAry as $bundle_id) {
-      $entityTrees[] = $treeBuilder->loadTree($entity_type, $bundle_id);
-    }
-    
-    foreach ($entityTrees as $tree) {
-      foreach ($tree as $entity) {
-        // Create tree node for each entity.
-        // Store them into an array passed to JS.
-        // An array in JavaScript is indexed list.
-        // JavaScript's array indices are always sequential
-        // and start from 0.
-        $entityAry[] = $treeBuilder->createTreeNode($entity);
-      }
-    }
-    
     // The status messages that will contain any form errors.
     $form['status_messages'] = [
         '#type' => 'status_messages',
         '#weight' => -10,
     ];
     
-    $form['tree_search'] = [
+    // Selectd entity text.
+    $form['selected_node'] = [
         '#type' => 'textfield',
         '#title' => $this
-        ->t('Search'),
-        '#size' => 60,
-        '#attributes' => [
-            'id' => [
-                'entity-reference-tree-search',
-            ],
-        ],
-    ];
-    
-    $form['tree_container'] = [
-        '#type' => 'html_tag',
-        '#tag' => 'div',
-        '#attributes' => [
-            'id' => [
-                'entity-reference-tree-wrapper',
-            ],
-        ],
-    ];
-    
-    $form['actions'] = array('#type' => 'actions');
-    $form['actions']['send'] = [
-        '#type' => 'submit',
-        '#value' => $this->t('Submit modal form'),
+          ->t('Selected'),
         '#attributes' => [
             'class' => [
-                'use-ajax',
+                'selected-entities-text',
             ],
+            'id' => [
+                'entity-reference-tree-selected-node',
+            ],
+            'readonly' => ['true'],
         ],
-        '#ajax' => [
-            'callback' => [$this, 'submitForm'],
-            'event' => 'click',
-        ],
+        '#weight' => 1000,
+        '#size' => 160,
     ];
     
-    $form['#attached']['library'][] = 'entity_reference_tree/jstree';
-    $form['#attached']['library'][] = 'entity_reference_tree/entity_tree';
-    // Pass data to js file.
-    $form['#attached']['drupalSettings'] = [
-        'tree_data' => $entityAry,
-    ];
+      foreach ($bundlesAry as $bundle_id) {
+        $tree = $treeBuilder->loadTree($entity_type, $bundle_id);
+        if (!empty($tree)) {
+          $entityTrees[] = $tree;
+        }
+      }
+      
+      if (empty($entityTrees)) {
+        $form['selected_node']['#value'] = $this->t('No tree access!');
+      }
+      else {
+        foreach ($entityTrees as $tree) {
+          foreach ($tree as $entity) {
+            // Create tree node for each entity.
+            // Store them into an array passed to JS.
+            // An array in JavaScript is indexed list.
+            // JavaScript's array indices are always sequential
+            // and start from 0.
+            $entityAry[] = $treeBuilder->createTreeNode($entity, $selectedAry);
+          }
+        }
+        
+        $form['tree_search'] = [
+            '#type' => 'textfield',
+            '#title' => $this
+            ->t('Search'),
+            '#size' => 60,
+            '#attributes' => [
+                'id' => [
+                    'entity-reference-tree-search',
+                ],
+            ],
+        ];
+        
+        $form['tree_container'] = [
+            '#type' => 'html_tag',
+            '#tag' => 'div',
+            '#attributes' => [
+                'id' => [
+                    'entity-reference-tree-wrapper',
+                ],
+            ],
+        ];
+        
+        $form['actions'] = array('#type' => 'actions');
+        $form['actions']['send'] = [
+            '#type' => 'submit',
+            '#value' => $this->t('Submit modal form'),
+            '#attributes' => [
+                'class' => [
+                    'use-ajax',
+                ],
+            ],
+            '#ajax' => [
+                'callback' => [$this, 'submitForm'],
+                'event' => 'click',
+            ],
+        ];
+        
+        $form['#attached']['library'][] = 'entity_reference_tree/jstree';
+        $form['#attached']['library'][] = 'entity_reference_tree/entity_tree';
+        // Pass data to js file.
+        $form['#attached']['drupalSettings'] = [
+            'tree_data' => $entityAry,
+        ];
+        
+        $form['field_id'] = array(
+            '#name' => 'field_id',
+            '#type' => 'hidden',
+            '#weight' => 80,
+            '#value' => $field_edit_id,
+            '#attributes' => [
+                'id' => [
+                    'entity-reference-tree-widget-field',
+                ],
+            ],
+        );
+      }
     
     return $form;
   }
@@ -144,6 +182,7 @@ class SearchForm extends FormBase {
       $response->addCommand(new ReplaceCommand('#entity_reference_tree_wrapper', $form));
     }
     else {
+      $response->addCommand(new SettingsCommand(['entity_tree_items' => ['field_id' => $form_state->getValue('field_id'), 'selected_entities' => $form_state->getValue('selected_node')]], TRUE));
       $response->addCommand(new CloseModalDialogCommand());
     }
     
