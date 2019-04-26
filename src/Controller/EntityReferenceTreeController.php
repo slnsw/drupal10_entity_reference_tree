@@ -12,15 +12,15 @@ use Drupal\Core\Ajax\OpenModalDialogCommand;
 /**
  * EntityReferenceTreeController class.
  */
-class  EntityReferenceTreeController extends ControllerBase {
-  
+class EntityReferenceTreeController extends ControllerBase {
+
   /**
    * The form builder.
    *
    * @var \Drupal\Core\Form\FormBuilder
    */
   protected $formBuilder;
-  
+
   /**
    * The EntityReferenceTreeController constructor.
    *
@@ -30,7 +30,7 @@ class  EntityReferenceTreeController extends ControllerBase {
   public function __construct(FormBuilder $formBuilder) {
     $this->formBuilder = $formBuilder;
   }
-  
+
   /**
    * {@inheritdoc}
    *
@@ -44,47 +44,47 @@ class  EntityReferenceTreeController extends ControllerBase {
         $container->get('form_builder')
         );
   }
-  
+
   /**
    * Callback for opening the modal form.
    */
   public function openSearchForm(string $field_edit_id, string $bundle, string $entity_type) {
     $response = new AjaxResponse();
-    
+
     // Get the modal form using the form builder.
     $modal_form = $this->formBuilder->getForm('Drupal\entity_reference_tree\Form\SearchForm', $field_edit_id, $bundle, $entity_type);
-    
+
     // Add an AJAX command to open a modal dialog with the form as the content.
     $response->addCommand(new OpenModalDialogCommand('Entity tree', $modal_form, ['width' => '800']));
-    
+
     return $response;
   }
-  
+
   /**
    * Callback for JsTree json data.
    */
   public function treeJson(string $entity_type, string $bundles) {
-    
+
     // Instance a entity tree builder for this entity type if it exists.
     if (\Drupal::hasService('entity_reference_' . $entity_type . '_tree_builder')) {
       $treeBuilder = \Drupal::service('entity_reference_' . $entity_type . '_tree_builder');
     }
     else {
       // Todo: A basic entity tree builder.
-      $treeBuilder = \Drupal::service('entity_reference_entity_tree_builder'); 
+      $treeBuilder = \Drupal::service('entity_reference_entity_tree_builder');
     }
-    
+
     $bundlesAry = explode(',', $bundles);
     $entityTrees = [];
     $entityNodeAry = [];
-    
+
     foreach ($bundlesAry as $bundle_id) {
       $tree = $treeBuilder->loadTree($entity_type, $bundle_id);
       if (!empty($tree)) {
         $entityTrees[] = $tree;
       }
     }
-    
+
     foreach ($entityTrees as $tree) {
       foreach ($tree as $entity) {
         // Create tree node for each entity.
@@ -95,7 +95,8 @@ class  EntityReferenceTreeController extends ControllerBase {
         $entityNodeAry[] = $treeBuilder->createTreeNode($entity);
       }
     }
-        
+
     return new JsonResponse($entityNodeAry);
   }
+
 }

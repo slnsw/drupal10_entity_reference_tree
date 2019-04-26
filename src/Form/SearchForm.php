@@ -9,10 +9,9 @@ use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Ajax\InvokeCommand;
 
-
 /**
  * ModalForm class.
- * 
+ *
  * To properly inject services, override create() and use the setters provided
  * by the traits to inject the needed services.
  *
@@ -27,83 +26,84 @@ use Drupal\Core\Ajax\InvokeCommand;
  * @endcode
  */
 class SearchForm extends FormBase {
+
   /**
    * {@inheritdoc}
    */
   public function getFormId() {
     return 'entity_reference_tree_search_form';
   }
-  
+
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $field_edit_id = [], $bundles = [], $entity_type= '', $selected = '') {
+  public function buildForm(array $form, FormStateInterface $form_state, $field_edit_id = [], $bundles = [], $entity_type = '', $selected = '') {
     // Do nothing after the form is submitted.
     if (!empty($form_state->getValues())) {
       return [];
     }
-    
+
     // The status messages that will contain any form errors.
     $form['status_messages'] = [
-        '#type' => 'status_messages',
-        '#weight' => -10,
+      '#type' => 'status_messages',
+      '#weight' => -10,
     ];
-    
+
     // Selectd entity text.
     $form['selected_node'] = [
-        '#type' => 'textfield',
-        '#title' => $this
-          ->t('Selected'),
-        '#attributes' => [
-            'class' => [
-                'selected-entities-text',
-            ],
-            'id' => [
-                'entity-reference-tree-selected-node',
-            ],
-            'readonly' => ['true'],
+      '#type' => 'textfield',
+      '#title' => $this
+        ->t('Selected'),
+      '#attributes' => [
+        'class' => [
+          'selected-entities-text',
         ],
-        '#weight' => 1000,
-        '#size' => 160,
+        'id' => [
+          'entity-reference-tree-selected-node',
+        ],
+        'readonly' => ['true'],
+      ],
+      '#weight' => 1000,
+      '#size' => 160,
     ];
     // Search filter box.
     $form['tree_search'] = [
-        '#type' => 'textfield',
-        '#title' => $this
+      '#type' => 'textfield',
+      '#title' => $this
         ->t('Search'),
-        '#size' => 60,
-        '#attributes' => [
-            'id' => [
-                'entity-reference-tree-search',
-            ],
+      '#size' => 60,
+      '#attributes' => [
+        'id' => [
+          'entity-reference-tree-search',
         ],
+      ],
     ];
     // JsTree container.
     $form['tree_container'] = [
-        '#type' => 'html_tag',
-        '#tag' => 'div',
-        '#attributes' => [
-            'id' => [
-                'entity-reference-tree-wrapper',
-            ],
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#attributes' => [
+        'id' => [
+          'entity-reference-tree-wrapper',
         ],
+      ],
     ];
     // Submit button.
-    $form['actions'] = array('#type' => 'actions');
+    $form['actions'] = ['#type' => 'actions'];
     $form['actions']['send'] = [
-        '#type' => 'submit',
-        '#value' => $this->t('Save'),
-        '#attributes' => [
-            'class' => [
-                'use-ajax',
-            ],
+      '#type' => 'submit',
+      '#value' => $this->t('Save'),
+      '#attributes' => [
+        'class' => [
+          'use-ajax',
         ],
-        '#ajax' => [
-            'callback' => [$this, 'submitForm'],
-            'event' => 'click',
-        ],
+      ],
+      '#ajax' => [
+        'callback' => [$this, 'submitForm'],
+        'event' => 'click',
+      ],
     ];
-    
+
     $form['#attached']['library'][] = 'entity_reference_tree/jstree';
     $form['#attached']['library'][] = 'entity_reference_tree/entity_tree';
 
@@ -112,51 +112,51 @@ class SearchForm extends FormBase {
     $form['#cache'] = ['max-age' => 0];
     $form['#attributes']['data-user-info-from-browser'] = FALSE;
     // Field element id.
-    $form['field_id'] = array(
-        '#name' => 'field_id',
-        '#type' => 'hidden',
-        '#weight' => 80,
-        '#value' => $field_edit_id,
-        '#attributes' => [
-            'id' => [
-                'entity-reference-tree-widget-field',
-            ],
+    $form['field_id'] = [
+      '#name' => 'field_id',
+      '#type' => 'hidden',
+      '#weight' => 80,
+      '#value' => $field_edit_id,
+      '#attributes' => [
+        'id' => [
+          'entity-reference-tree-widget-field',
         ],
-    );
+      ],
+    ];
     // Entity type.
-    $form['entity_type'] = array(
-        '#name' => 'entity_type',
-        '#type' => 'hidden',
-        '#weight' => 80,
-        '#value' => $entity_type,
-        '#attributes' => [
-            'id' => [
-                'entity-reference-tree-entity-type',
-            ],
+    $form['entity_type'] = [
+      '#name' => 'entity_type',
+      '#type' => 'hidden',
+      '#weight' => 80,
+      '#value' => $entity_type,
+      '#attributes' => [
+        'id' => [
+          'entity-reference-tree-entity-type',
         ],
-    );
+      ],
+    ];
     // Entity bundle.
-    $form['entity_bundle'] = array(
-        '#name' => 'entity_bundle',
-        '#type' => 'hidden',
-        '#weight' => 80,
-        '#value' => $bundles,
-        '#attributes' => [
-            'id' => [
-                'entity-reference-tree-entity-bundle',
-            ],
+    $form['entity_bundle'] = [
+      '#name' => 'entity_bundle',
+      '#type' => 'hidden',
+      '#weight' => 80,
+      '#value' => $bundles,
+      '#attributes' => [
+        'id' => [
+          'entity-reference-tree-entity-bundle',
         ],
-    );
-    
+      ],
+    ];
+
     return $form;
   }
-  
+
   /**
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $response = new AjaxResponse();
-    
+
     // If there are any form errors, re-display the form.
     if ($form_state->hasAnyErrors()) {
       $response->addCommand(new ReplaceCommand('#entity_reference_tree_wrapper', $form));
@@ -165,7 +165,8 @@ class SearchForm extends FormBase {
       $response->addCommand(new InvokeCommand(NULL, 'entitySearchDialogAjaxCallback', [$form_state->getValue('field_id'), $form_state->getValue('selected_node')]));
       $response->addCommand(new CloseModalDialogCommand());
     }
-    
+
     return $response;
   }
+
 }

@@ -2,20 +2,19 @@
 
 namespace Drupal\entity_reference_tree\Tree;
 
-
 /**
  * Provides an interface for a tree builder.
  *
  * @ingroup entity_reference_tree_api
  */
 interface TreeBuilderInterface {
-  
+
   /**
    * Load all entities from an entity bundle for the tree.
    *
    * @param string $entityType
    *   The type of the entity.
-   *   
+   *
    * @param string $bundleID
    *   The bundle ID.
    *
@@ -23,13 +22,13 @@ interface TreeBuilderInterface {
    *   All entities in the entity bundle.
    */
   public function loadTree(string $entityType, string $bundleID, int $parent = 0, int $max_depth = NULL);
-  
+
   /**
    * Create a tree node.
    *
    * @param object $entity
    *   The entity for the tree node.
-   *   
+   *
    * @param array $selected
    *   A anrray for all selected nodes.
    *
@@ -37,7 +36,7 @@ interface TreeBuilderInterface {
    *   The tree node for the entity.
    */
   public function createTreeNode(object $entity, array $selected = []);
-  
+
   /**
    * Get the ID of a tree node.
    *
@@ -47,6 +46,6 @@ interface TreeBuilderInterface {
    * @return string|int|null
    *   The id of the tree node for the entity.
    */
-  public function getNodeID(object $entity);
-  
+  public function getNodeId(object $entity);
+
 }

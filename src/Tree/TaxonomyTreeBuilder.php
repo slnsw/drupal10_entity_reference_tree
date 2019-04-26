@@ -1,32 +1,31 @@
 <?php
+
 namespace Drupal\entity_reference_tree\Tree;
 
 use Drupal\Core\Session\AccountProxyInterface;
 
-
-
 /**
  * Provides a class for building a tree from taxonomy entity.
- * 
+ *
  * @ingroup entity_reference_tree_api
  *
  * @see \Drupal\entity_reference_tree\Tree\TreeBuilderInterface
  */
 class TaxonomyTreeBuilder implements TreeBuilderInterface {
-  
+
   /**
    *
-   * @var string $accessPermission
+   * @var string
    *   The permission name to access the tree.
    */
-   private $accessPermission = 'access taxonomy overview';
-  
+  private $accessPermission = 'access taxonomy overview';
+
   /**
    * Load all entities from an entity bundle for the tree.
    *
    * @param string $entityType
    *   The type of the entity.
-   *   
+   *
    * @param string $bundleID
    *   The bundle ID.
    *
@@ -40,7 +39,7 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
     // The user is not allowed to access taxonomy overviews.
     return NULL;
   }
-  
+
   /**
    * Create a tree node.
    *
@@ -55,26 +54,29 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
    */
   public function createTreeNode(object $entity, array $selected = []) {
     $parent = $entity->parents[0];
-    
+
     if ($parent === '0') {
       $parent = '#';
     }
-    
+
     $node = [
-        'id' => $entity->tid,  // required
-        'parent' => $parent, // required
-        'text' => $entity->name, // node text
-        'state' => ['selected' => false],
+    // Required.
+      'id' => $entity->tid,
+    // Required.
+      'parent' => $parent,
+    // Node text.
+      'text' => $entity->name,
+      'state' => ['selected' => FALSE],
     ];
-    
+
     if (in_array($entity->tid, $selected)) {
       // Initially selected node.
-      $node['state']['selected'] = true;
+      $node['state']['selected'] = TRUE;
     }
-    
+
     return $node;
   }
-  
+
   /**
    * Get the ID of a tree node.
    *
@@ -84,17 +86,17 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
    * @return string|int|null
    *   The id of the tree node for the entity.
    */
-  public function getNodeID(object $entity) {
+  public function getNodeId(object $entity) {
     return $entity->tid;
   }
-  
+
   /**
    * Check if a user has the access to the tree.
    *
-   * @param AccountProxyInterface $user
+   * @param \Drupal\Core\Session\AccountProxyInterface $user
    *   The user object to check.
    *
-   * @return boolean
+   * @return bool
    *   If the user has the access to the tree return TRUE,
    *   otherwise return FALSE.
    */
@@ -103,7 +105,8 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
     if (empty($user)) {
       $user = \Drupal::currentUser();
     }
-    
+
     return $user->hasPermission($this->accessPermission);
   }
+
 }
