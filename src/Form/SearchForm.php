@@ -7,7 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
-use Drupal\Core\Ajax\SettingsCommand;
+use Drupal\Core\Ajax\InvokeCommand;
 
 
 /**
@@ -38,18 +38,8 @@ class SearchForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $field_edit_id = [], $bundles = [], $entity_type= '', $selected = '') {
-    $bundlesAry = explode(',', $bundles);
-    $selectedAry = explode(',', $selected);
-    // Entitys array.
-    $entityAry = [];
-    $entityTrees = [];
-    
-    // Instance a entity tree builder for this entity type if it exists.
-    if (\Drupal::hasService('entity_reference_' . $entity_type . '_tree_builder')) {
-      $treeBuilder = \Drupal::service('entity_reference_' . $entity_type . '_tree_builder');
-    }
-    else {
-      // Todo: A basic entity tree builder.
+    // Do nothing after the form is submitted.
+    if (!empty($form_state->getValues())) {
       return [];
     }
     
@@ -76,100 +66,90 @@ class SearchForm extends FormBase {
         '#weight' => 1000,
         '#size' => 160,
     ];
+    // Search filter box.
+    $form['tree_search'] = [
+        '#type' => 'textfield',
+        '#title' => $this
+        ->t('Search'),
+        '#size' => 60,
+        '#attributes' => [
+            'id' => [
+                'entity-reference-tree-search',
+            ],
+        ],
+    ];
+    // JsTree container.
+    $form['tree_container'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#attributes' => [
+            'id' => [
+                'entity-reference-tree-wrapper',
+            ],
+        ],
+    ];
+    // Submit button.
+    $form['actions'] = array('#type' => 'actions');
+    $form['actions']['send'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Save'),
+        '#attributes' => [
+            'class' => [
+                'use-ajax',
+            ],
+        ],
+        '#ajax' => [
+            'callback' => [$this, 'submitForm'],
+            'event' => 'click',
+        ],
+    ];
     
-      foreach ($bundlesAry as $bundle_id) {
-        $tree = $treeBuilder->loadTree($entity_type, $bundle_id);
-        if (!empty($tree)) {
-          $entityTrees[] = $tree;
-        }
-      }
-      
-      if (empty($entityTrees)) {
-        $form['selected_node']['#value'] = $this->t('No tree access!');
-      }
-      else {
-        foreach ($entityTrees as $tree) {
-          foreach ($tree as $entity) {
-            // Create tree node for each entity.
-            // Store them into an array passed to JS.
-            // An array in JavaScript is indexed list.
-            // JavaScript's array indices are always sequential
-            // and start from 0.
-            $entityAry[] = $treeBuilder->createTreeNode($entity, $selectedAry);
-          }
-        }
-        
-        $form['tree_search'] = [
-            '#type' => 'textfield',
-            '#title' => $this
-            ->t('Search'),
-            '#size' => 60,
-            '#attributes' => [
-                'id' => [
-                    'entity-reference-tree-search',
-                ],
+    $form['#attached']['library'][] = 'entity_reference_tree/jstree';
+    $form['#attached']['library'][] = 'entity_reference_tree/entity_tree';
+
+    // Disable the cache for this form.
+    $form_state->setCached(FALSE);
+    $form['#cache'] = ['max-age' => 0];
+    $form['#attributes']['data-user-info-from-browser'] = FALSE;
+    // Field element id.
+    $form['field_id'] = array(
+        '#name' => 'field_id',
+        '#type' => 'hidden',
+        '#weight' => 80,
+        '#value' => $field_edit_id,
+        '#attributes' => [
+            'id' => [
+                'entity-reference-tree-widget-field',
             ],
-        ];
-        
-        $form['tree_container'] = [
-            '#type' => 'html_tag',
-            '#tag' => 'div',
-            '#attributes' => [
-                'id' => [
-                    'entity-reference-tree-wrapper',
-                ],
+        ],
+    );
+    // Entity type.
+    $form['entity_type'] = array(
+        '#name' => 'entity_type',
+        '#type' => 'hidden',
+        '#weight' => 80,
+        '#value' => $entity_type,
+        '#attributes' => [
+            'id' => [
+                'entity-reference-tree-entity-type',
             ],
-        ];
-        
-        $form['actions'] = array('#type' => 'actions');
-        $form['actions']['send'] = [
-            '#type' => 'submit',
-            '#value' => $this->t('Submit modal form'),
-            '#attributes' => [
-                'class' => [
-                    'use-ajax',
-                ],
+        ],
+    );
+    // Entity bundle.
+    $form['entity_bundle'] = array(
+        '#name' => 'entity_bundle',
+        '#type' => 'hidden',
+        '#weight' => 80,
+        '#value' => $bundles,
+        '#attributes' => [
+            'id' => [
+                'entity-reference-tree-entity-bundle',
             ],
-            '#ajax' => [
-                'callback' => [$this, 'submitForm'],
-                'event' => 'click',
-            ],
-        ];
-        
-        $form['#attached']['library'][] = 'entity_reference_tree/jstree';
-        $form['#attached']['library'][] = 'entity_reference_tree/entity_tree';
-        // Pass data to js file.
-        $form['#attached']['drupalSettings'] = [
-            'tree_data' => $entityAry,
-        ];
-        
-        $form['field_id'] = array(
-            '#name' => 'field_id',
-            '#type' => 'hidden',
-            '#weight' => 80,
-            '#value' => $field_edit_id,
-            '#attributes' => [
-                'id' => [
-                    'entity-reference-tree-widget-field',
-                ],
-            ],
-        );
-      }
+        ],
+    );
     
     return $form;
   }
-  
-  /**
-   * AJAX callback handler that displays any errors or a success message.
-   */
-  public function submitModalFormAjax(array $form, FormStateInterface $form_state) {
-  
-  }
-  
-  /**
-   * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state) {}
   
   /**
    * {@inheritdoc}
@@ -182,7 +162,7 @@ class SearchForm extends FormBase {
       $response->addCommand(new ReplaceCommand('#entity_reference_tree_wrapper', $form));
     }
     else {
-      $response->addCommand(new SettingsCommand(['entity_tree_items' => ['field_id' => $form_state->getValue('field_id'), 'selected_entities' => $form_state->getValue('selected_node')]], TRUE));
+      $response->addCommand(new InvokeCommand(NULL, 'entitySearchDialogAjaxCallback', [$form_state->getValue('field_id'), $form_state->getValue('selected_node')]));
       $response->addCommand(new CloseModalDialogCommand());
     }
     

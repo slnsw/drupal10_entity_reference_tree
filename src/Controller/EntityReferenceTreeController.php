@@ -48,11 +48,11 @@ class  EntityReferenceTreeController extends ControllerBase {
   /**
    * Callback for opening the modal form.
    */
-  public function openSearchForm(string $field_edit_id, string $bundle, string $entity_type, string $selected) {
+  public function openSearchForm(string $field_edit_id, string $bundle, string $entity_type) {
     $response = new AjaxResponse();
     
     // Get the modal form using the form builder.
-    $modal_form = $this->formBuilder->getForm('Drupal\entity_reference_tree\Form\SearchForm', $field_edit_id, $bundle, $entity_type, $selected);
+    $modal_form = $this->formBuilder->getForm('Drupal\entity_reference_tree\Form\SearchForm', $field_edit_id, $bundle, $entity_type);
     
     // Add an AJAX command to open a modal dialog with the form as the content.
     $response->addCommand(new OpenModalDialogCommand('Entity tree', $modal_form, ['width' => '800']));
@@ -71,49 +71,31 @@ class  EntityReferenceTreeController extends ControllerBase {
     }
     else {
       // Todo: A basic entity tree builder.
-      return [];
+      $treeBuilder = \Drupal::service('entity_reference_entity_tree_builder'); 
     }
     
-    $bundlesAry = explode('+', $bundles);
+    $bundlesAry = explode(',', $bundles);
     $entityTrees = [];
     $entityNodeAry = [];
     
     foreach ($bundlesAry as $bundle_id) {
-      $entityTrees[] = $treeBuilder->loadTree($entity_type, $bundle_id);
+      $tree = $treeBuilder->loadTree($entity_type, $bundle_id);
+      if (!empty($tree)) {
+        $entityTrees[] = $tree;
+      }
     }
     
     foreach ($entityTrees as $tree) {
       foreach ($tree as $entity) {
         // Create tree node for each entity.
-        // Store them into an array.
-        $entityNodeAry[$treeBuilder->getNodeID($entity)] = $treeBuilder->createTreeNode($entity);
+        // Store them into an array passed to JS.
+        // An array in JavaScript is indexed list.
+        // JavaScript's array indices are always sequential
+        // and start from 0.
+        $entityNodeAry[] = $treeBuilder->createTreeNode($entity);
       }
     }
-    
-    $json_array = array(
-        'data' => array()
-    );
-
-    foreach ($entityNodeAry as $entityNode) {
-      $json_array['data'][] = array(
-          'id' => $entityNode['id'],
-          'parent' => $entityNode['parent'],
-          'text' => $entityNode['text'],
-      );
-    }
-    
-    $temp = [
-        'data' => [
-          [ "id" => "ajson1", "parent" => "#", "text" => "Simple root node" ],
-          [ "id" => "ajson2", "parent" => "#", "text" => "Root node 2" ],
-          [ "id" => "ajson3", "parent" => "ajson2", "text" => "Child 1" ],
-          [ "id" => "ajson4", "parent" => "ajson2", "text" => "Child 2" ],
-       ]
-    ];
-    
-    return new JsonResponse($temp);
+        
+    return new JsonResponse($entityNodeAry);
   }
-  
-  
-  
 }

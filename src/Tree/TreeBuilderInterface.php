@@ -36,7 +36,7 @@ interface TreeBuilderInterface {
    * @return array
    *   The tree node for the entity.
    */
-  public function createTreeNode(object $entity, array $selected);
+  public function createTreeNode(object $entity, array $selected = []);
   
   /**
    * Get the ID of a tree node.

@@ -6,20 +6,20 @@ use Drupal\Core\Session\AccountProxyInterface;
 
 
 /**
- * Provides a class for building a tree from taxonomy entity.
+ * Provides a class for building a tree from general entity.
  * 
  * @ingroup entity_reference_tree_api
  *
  * @see \Drupal\entity_reference_tree\Tree\TreeBuilderInterface
  */
-class TaxonomyTreeBuilder implements TreeBuilderInterface {
+class EntityTreeBuilder implements TreeBuilderInterface {
   
   /**
    *
    * @var string $accessPermission
    *   The permission name to access the tree.
    */
-   private $accessPermission = 'access taxonomy overview';
+   private $accessPermission = 'access content';
   
   /**
    * Load all entities from an entity bundle for the tree.
@@ -35,7 +35,35 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
    */
   public function loadTree(string $entityType, string $bundleID, int $parent = 0, int $max_depth = NULL) {
     if ($this->hasAccess()) {
-      return \Drupal::entityTypeManager()->getStorage($entityType)->loadTree($bundleID, $parent, $max_depth);
+      $tree = [
+       (object)[
+         'id' => $bundleID,
+         'parent' => '#', // required
+         'text' => $bundleID, // node text
+       ],
+      ];
+      
+      // Load the next release node.
+      $eids = \Drupal::entityQuery($entityType)
+      ->condition('type', $bundleID)
+      ->execute();
+      // No entity found.
+      if (empty($eids)) {
+        return $tree;
+      }
+      
+      // Load all entities matched the conditions.
+      $entities = \Drupal::entityTypeManager()->getStorage($entityType)->loadMultiple($eids);
+      // Find the node whose release date is just next to the current one.
+      foreach ($entities as $entity) {
+        $tree[] =  (object)[
+            'id' => $entity->id(),
+            'parent' => $entity->bundle(), // required
+            'text' => $entity->label(), // node text
+        ];
+      }
+      
+      return $tree;
     }
     // The user is not allowed to access taxonomy overviews.
     return NULL;
@@ -53,21 +81,16 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
    * @return array
    *   The tree node for the entity.
    */
-  public function createTreeNode(object $entity, array $selected = []) {
-    $parent = $entity->parents[0];
-    
-    if ($parent === '0') {
-      $parent = '#';
-    }
+  public function createTreeNode(object $entity, array $selected = []) {   
     
     $node = [
-        'id' => $entity->tid,  // required
-        'parent' => $parent, // required
-        'text' => $entity->name, // node text
+        'id' => $entity->id,  // required
+        'parent' => $entity->parent, // required
+        'text' => $entity->text, // node text
         'state' => ['selected' => false],
     ];
     
-    if (in_array($entity->tid, $selected)) {
+    if (in_array($entity->id, $selected)) {
       // Initially selected node.
       $node['state']['selected'] = true;
     }
@@ -85,7 +108,7 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
    *   The id of the tree node for the entity.
    */
   public function getNodeID(object $entity) {
-    return $entity->tid;
+    return $entity->id;
   }
   
   /**

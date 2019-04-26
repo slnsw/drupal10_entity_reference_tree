@@ -1,5 +1,5 @@
 entity_reference_tree.widget_form:
-  path: '/admin/entity_reference_tree/search/{field_edit_id}/{bundle}/{entity_type}/{selected}'
+  path: '/admin/entity_reference_tree/search/{field_edit_id}/{bundle}/{entity_type}'
   defaults:
     _title: 'Entity Reference Search'
     _controller: '\Drupal\entity_reference_tree\Controller\EntityReferenceTreeController::openSearchForm'
@@ -8,12 +8,12 @@ entity_reference_tree.widget_form:
   options:
     _admin_route: TRUE
     
-#entity_reference_tree.json:
-#  path: '/admin/entity_reference_tree/json/{entity_type}/{bundles}'
-#  defaults:
-#    _title: 'Entity Reference Search'
-#    _controller: '\Drupal\entity_reference_tree\Controller\EntityReferenceTreeController::treeJson'
-#  requirements:
-#    _permission: 'administer site configuration'
-#  options:
-#    _admin_route: TRUE
+entity_reference_tree.json:
+  path: '/admin/entity_reference_tree/json/{entity_type}/{bundles}'
+  defaults:
+    _title: 'Entity Reference Search'
+    _controller: '\Drupal\entity_reference_tree\Controller\EntityReferenceTreeController::treeJson'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _admin_route: TRUE
