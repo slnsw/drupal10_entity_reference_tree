@@ -12,6 +12,8 @@
     		var treeContainer = $(this);
     		const fieldEditName =  $('#entity-reference-tree-widget-field').val();
     		const widgetElement = $('#' + fieldEditName);
+    		const theme = treeContainer.attr('theme');
+    		const dots = treeContainer.attr('dots');
     		// Avoid ajax callback from running following codes again. 
     		if (widgetElement.length) {
       		const entityType = $('#entity-reference-tree-entity-type').val();
@@ -33,7 +35,6 @@
       		// Build the tree.
       		treeContainer.jstree({ 
         		'core' : {
-        	//	  'data' : data,
         			'data' : {
         		    'url' : function (node) {
         		      return "/admin/entity_reference_tree/json/" + entityType + '/' + bundle;
@@ -41,11 +42,19 @@
         		    'data' : function (node) {
         		      return { 'id' : node.id, 'text': node.text, 'parent': node.parent, };
         		    }
+        			},
+        			'themes': {
+        				'dots': dots === '1' ? true : false,
+        				"name": theme,
         			}
+            },
+            "checkbox" : {
+              "three_state" : false
             },
             "plugins" : [
               "search",
               "changed",
+              "checkbox",
             ]
         	});
       		// Initialize the selected node.

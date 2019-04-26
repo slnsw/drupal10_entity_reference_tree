@@ -50,7 +50,8 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
             'field_edit_id' => $edit_id,
             'bundle' => $str_target,
             'entity_type' => $str_target_type,
-
+            'theme' => $this->getSetting('theme'),
+            'dots' => $this->getSetting('dots'),
           ]),
       '#attributes' => [
         'class' => [
@@ -69,5 +70,61 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     return $values['target_id'];
   }
-
+  
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return [
+        // JsTree theme
+        'theme' => 'default',
+        // Using dot line.
+        'dots' => 0,
+    ] + parent::defaultSettings();
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = [];
+    $element['theme'] = [
+        '#type' => 'radios',
+        '#title' => t('JsTree theme'),
+        '#default_value' => $this->getSetting('theme'),
+        '#required' => TRUE,
+        '#options' => array(
+            'default' => $this
+            ->t('Default'),
+            'default-dark' => $this
+            ->t('Default Dark'),
+        ), 
+    ];
+    
+    $element['dots'] = [
+        '#type' => 'radios',
+        '#title' => t('Dot line'),
+        '#default_value' => $this->getSetting('dots'),
+        '#options' => array(
+            0 => $this
+            ->t('No'),
+            1 => $this
+            ->t('Yes'),
+        ),
+    ];
+    
+    
+    return $element;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $summary = [];
+    
+    $summary[] = t('JsTree theme: @theme', array('@theme' => $this->getSetting('theme')));
+    
+    return $summary;
+  }
 }

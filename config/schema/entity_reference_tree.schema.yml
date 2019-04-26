@@ -1,0 +1,10 @@
+field.widget.settings.entity_reference_tree:
+  type: mapping
+  label: 'Entity reference tree widget settings'
+  mapping:
+    theme:
+      type: string
+      label: 'JsTree Theme'
+    dots:
+      type: integer
+      label: 'Dot line'

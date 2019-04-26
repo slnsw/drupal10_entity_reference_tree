@@ -37,7 +37,7 @@ class SearchForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $field_edit_id = [], $bundles = [], $entity_type = '', $selected = '') {
+  public function buildForm(array $form, FormStateInterface $form_state, $field_edit_id = [], $bundles = [], $entity_type = '', $theme = 'default', $dots = false) {
     // Do nothing after the form is submitted.
     if (!empty($form_state->getValues())) {
       return [];
@@ -86,6 +86,8 @@ class SearchForm extends FormBase {
         'id' => [
           'entity-reference-tree-wrapper',
         ],
+        'theme' => $theme,
+        'dots' => $dots, 
       ],
     ];
     // Submit button.
@@ -106,6 +108,7 @@ class SearchForm extends FormBase {
 
     $form['#attached']['library'][] = 'entity_reference_tree/jstree';
     $form['#attached']['library'][] = 'entity_reference_tree/entity_tree';
+    $form['#attached']['library'][] = 'entity_reference_tree/jstree_' . $theme . '_theme';
 
     // Disable the cache for this form.
     $form_state->setCached(FALSE);
