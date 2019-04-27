@@ -11,8 +11,8 @@ A Tree widget of entity reference field  for Drupal
     
 ## Overview
 
-Drupal entity reference field, such as taonomy term reference or content refernce might have very complex
-hierarchy. The autocomplete widget or dropdown select box widget implemented by Drupal core doesn't present the relationship between those entities. This module provide a combination of an autocomplete textfield and a tree view for reference field as one widget. This module use JsTree JavaScript library to render a hierarchy tree of those reference entities. 
+Drupal entity reference field, such as taxonomy term reference or content reference might have very complex
+hierarchy. The autocomplete widget or drop down select box widget implemented by Drupal core doesn't present the relationship between those entities. This module provide a combination of an autocomplete textfield and a tree view for reference field as one widget. This module use JsTree JavaScript library to render a hierarchy tree of those reference entities. 
 
 ### Requirements
 
@@ -29,5 +29,5 @@ hierarchy. The autocomplete widget or dropdown select box widget implemented by 
 - The field widget only work with reference field, such as taxonomy term or contents. The widget settings is
   located in the fields form display page (/admin/structure/types/manage/[Content Type]/form-display)  
 
-- Selecte the 'Entity reference tree widget' for the reference field that you want to.
+- Select the 'Entity reference tree widget' for the reference field that you want to.
 
