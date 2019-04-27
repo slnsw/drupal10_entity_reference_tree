@@ -43,7 +43,7 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
   /**
    * Create a tree node.
    *
-   * @param object $entity
+   * @param $entity
    *   The entity for the tree node.
    *
    * @param array $selected
@@ -52,7 +52,7 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
    * @return array
    *   The tree node for the entity.
    */
-  public function createTreeNode(object $entity, array $selected = []) {
+  public function createTreeNode($entity, array $selected = []) {
     $parent = $entity->parents[0];
 
     if ($parent === '0') {
@@ -80,13 +80,13 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
   /**
    * Get the ID of a tree node.
    *
-   * @param object $entity
+   * @param $entity
    *   The entity for the tree node.
    *
    * @return string|int|null
    *   The id of the tree node for the entity.
    */
-  public function getNodeId(object $entity) {
+  public function getNodeId($entity) {
     return $entity->tid;
   }
 

@@ -43,7 +43,7 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
 
     $arr_element['dialog_link'] = [
       '#type' => 'link',
-      '#title' => $this->t('Entity tree'),
+        '#title' => $this->t(ucfirst(str_replace('_', ' ', $str_target_type)) . ' tree'),
       '#url' => Url::fromRoute(
           'entity_reference_tree.widget_form',
           [

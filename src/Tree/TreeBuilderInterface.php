@@ -26,7 +26,7 @@ interface TreeBuilderInterface {
   /**
    * Create a tree node.
    *
-   * @param object $entity
+   * @param $entity
    *   The entity for the tree node.
    *
    * @param array $selected
@@ -35,17 +35,17 @@ interface TreeBuilderInterface {
    * @return array
    *   The tree node for the entity.
    */
-  public function createTreeNode(object $entity, array $selected = []);
+  public function createTreeNode($entity, array $selected = []);
 
   /**
    * Get the ID of a tree node.
    *
-   * @param object $entity
+   * @param $entity
    *   The entity for the tree node.
    *
    * @return string|int|null
    *   The id of the tree node for the entity.
    */
-  public function getNodeId(object $entity);
+  public function getNodeId($entity);
 
 }

@@ -55,7 +55,7 @@ class EntityReferenceTreeController extends ControllerBase {
     $modal_form = $this->formBuilder->getForm('Drupal\entity_reference_tree\Form\SearchForm', $field_edit_id, $bundle, $entity_type, $theme, $dots);
 
     // Add an AJAX command to open a modal dialog with the form as the content.
-    $response->addCommand(new OpenModalDialogCommand('Entity tree', $modal_form, ['width' => '800']));
+    $response->addCommand(new OpenModalDialogCommand($this->t(ucfirst(str_replace('_', ' ', $entity_type)) . ' tree'), $modal_form, ['width' => '800']));
 
     return $response;
   }
