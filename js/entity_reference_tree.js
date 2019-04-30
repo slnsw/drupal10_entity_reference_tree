@@ -32,6 +32,7 @@
       		}
       		// Populate the selected entities text.  
       		$('#entity-reference-tree-selected-node').val(widgetElement.val());
+      		$('#entity-reference-tree-selected-text').text('Selected entities: ' + widgetElement.val());
       		// Build the tree.
       		treeContainer.jstree({ 
         		'core' : {
@@ -71,6 +72,7 @@
                 }
                 selectedText = r.join(', ');
                 $('#entity-reference-tree-selected-node').val(selectedText);
+                $('#entity-reference-tree-selected-text').text('Selected entities: ' + selectedText);
                 
             }
           );

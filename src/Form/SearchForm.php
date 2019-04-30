@@ -50,21 +50,29 @@ class SearchForm extends FormBase {
     ];
 
     // Selectd entity text.
-    $form['selected_node'] = [
-      '#type' => 'textfield',
-      '#title' => $this
-        ->t('Selected'),
-      '#attributes' => [
-        'class' => [
-          'selected-entities-text',
+    $form['selected_text'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#value' => $this
+        ->t('Selected Entities'),
+        '#weight' => 1000,
+        '#attributes' => [
+            'class' => [
+                'selected-entities-text',
+            ],
+            'id' => [
+                'entity-reference-tree-selected-text',
+            ],
         ],
+    ];
+    // Hidden field for submitting selected entity IDs.
+    $form['selected_node'] = [
+      '#type' => 'hidden',
+      '#attributes' => [
         'id' => [
           'entity-reference-tree-selected-node',
         ],
-        'readonly' => ['true'],
       ],
-      '#weight' => 1000,
-      '#size' => 160,
     ];
     // Search filter box.
     $form['tree_search'] = [
