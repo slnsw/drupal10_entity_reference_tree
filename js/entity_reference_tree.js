@@ -52,6 +52,9 @@
             "checkbox" : {
               "three_state" : false
             },
+            "search" : {
+            	"show_only_matches": true,
+            },
             "plugins" : [
               "search",
               "changed",
