@@ -71,7 +71,13 @@
               	var r = [], selectedText;
                 for (var i = 0; i < selectedNodes.length; i++) {
                 	var node = data.instance.get_node(selectedNodes[i]);
-                  r.push(node.text + ' (' + node.id + ')');
+                	// node text escaping double quote.
+                	var nodeText = node.text.replace(/"/g, '""') + ' (' + node.id + ')';
+                	// Comma is a special character for autocomplete widge.       
+                	if (nodeText.indexOf(',') !== -1 || nodeText.indexOf("'") !== -1) {
+                		nodeText = '"' + nodeText + '"';
+                	}
+                  r.push(nodeText);
                 }
                 selectedText = r.join(', ');
                 $('#entity-reference-tree-selected-node').val(selectedText);
