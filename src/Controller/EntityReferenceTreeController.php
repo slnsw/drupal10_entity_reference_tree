@@ -6,6 +6,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Form\FormBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\OpenModalDialogCommand;
 
@@ -48,7 +49,7 @@ class EntityReferenceTreeController extends ControllerBase {
   /**
    * Callback for opening the modal form.
    */
-  public function openSearchForm(string $field_edit_id, string $bundle, string $entity_type, string $theme, int $dots) {
+  public function openSearchForm(Request $request, string $field_edit_id, string $bundle, string $entity_type, string $theme, int $dots) {
     $response = new AjaxResponse();
 
     // Get the modal form using the form builder.
