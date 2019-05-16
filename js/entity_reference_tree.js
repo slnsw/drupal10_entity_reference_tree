@@ -38,7 +38,7 @@
         		'core' : {
         			'data' : {
         		    'url' : function (node) {
-        		      return "/admin/entity_reference_tree/json/" + entityType + '/' + bundle;
+        		      return Drupal.url("admin/entity_reference_tree/json/" + entityType + '/' + bundle);
         		    },
         		    'data' : function (node) {
         		      return { 'id' : node.id, 'text': node.text, 'parent': node.parent, };
