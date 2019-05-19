@@ -37,7 +37,7 @@ class SearchForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $field_edit_id = [], $bundles = [], $entity_type = '', $theme = 'default', $dots = false) {
+  public function buildForm(array $form, FormStateInterface $form_state, $field_edit_id = '', $bundles = '', $entity_type = '', $theme = 'default', $dots = false) {
     // Do nothing after the form is submitted.
     if (!empty($form_state->getValues())) {
       return [];
@@ -157,6 +157,11 @@ class SearchForm extends FormBase {
           'entity-reference-tree-entity-bundle',
         ],
       ],
+    ];
+    
+    // Pass data to js file.
+    $form['#attached']['drupalSettings'] = [
+        'entity_tree_token_' . $field_edit_id => \Drupal::csrfToken()->get($bundles),
     ];
 
     return $form;

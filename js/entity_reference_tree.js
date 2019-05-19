@@ -18,6 +18,7 @@
     		if (widgetElement.length) {
       		const entityType = $('#entity-reference-tree-entity-type').val();
       		const bundle = $('#entity-reference-tree-entity-bundle').val();
+      		const token = settings['entity_tree_token_' + fieldEditName];
        		// Selected nodes.
       		var selectedNodes = widgetElement.val().match(/\((\d+)\)/g);
       		if (selectedNodes) {
@@ -38,7 +39,7 @@
         		'core' : {
         			'data' : {
         		    'url' : function (node) {
-        		      return Drupal.url("admin/entity_reference_tree/json/" + entityType + '/' + bundle);
+        		      return Drupal.url("admin/entity_reference_tree/json/" + entityType + '/' + bundle + '?token=' + token);
         		    },
         		    'data' : function (node) {
         		      return { 'id' : node.id, 'text': node.text, 'parent': node.parent, };

@@ -6,7 +6,9 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Form\FormBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\OpenModalDialogCommand;
 
@@ -21,6 +23,13 @@ class EntityReferenceTreeController extends ControllerBase {
    * @var \Drupal\Core\Form\FormBuilder
    */
   protected $formBuilder;
+  
+  /**
+   * CSRF Token.
+   *
+   * @var \Drupal\Core\Access\CsrfTokenGenerator
+   */
+  protected $csrfToken;
 
   /**
    * The EntityReferenceTreeController constructor.
@@ -28,8 +37,9 @@ class EntityReferenceTreeController extends ControllerBase {
    * @param \Drupal\Core\Form\FormBuilder $formBuilder
    *   The form builder.
    */
-  public function __construct(FormBuilder $formBuilder) {
+  public function __construct(FormBuilder $formBuilder, CsrfTokenGenerator $csrfToken) {
     $this->formBuilder = $formBuilder;
+    $this->csrfToken = $csrfToken;
   }
 
   /**
@@ -42,7 +52,8 @@ class EntityReferenceTreeController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-        $container->get('form_builder')
+        $container->get('form_builder'),
+        $container->get('csrf_token')
         );
   }
 
@@ -64,7 +75,12 @@ class EntityReferenceTreeController extends ControllerBase {
   /**
    * Callback for JsTree json data.
    */
-  public function treeJson(string $entity_type, string $bundles) {
+  public function treeJson(Request $request, string $entity_type, string $bundles) {
+    $token = $request->get('token');
+    
+    if (empty($token) || !$this->csrfToken->validate($token, $bundles)) {
+      return new Response($this->t('Access denied!'));
+    }
 
     // Instance a entity tree builder for this entity type if it exists.
     if (\Drupal::hasService('entity_reference_' . $entity_type . '_tree_builder')) {
