@@ -8,129 +8,144 @@
 (function($, Drupal) {
   Drupal.behaviors.entityReferenceTree = {
     attach: function(context, settings) {
-    	$('#entity-reference-tree-wrapper', context).once('jstreeBehavior').each(function () {
-    		var treeContainer = $(this);
-    		const fieldEditName =  $('#entity-reference-tree-widget-field').val();
-    		const widgetElement = $('#' + fieldEditName);
-    		const theme = treeContainer.attr('theme');
-    		const dots = treeContainer.attr('dots');
-    		// Avoid ajax callback from running following codes again. 
-    		if (widgetElement.length) {
-      		const entityType = $('#entity-reference-tree-entity-type').val();
-      		const bundle = $('#entity-reference-tree-entity-bundle').val();
-      		const token = settings['entity_tree_token_' + fieldEditName];
-      		const idIsString = (bundle === '*');
-       		// Selected nodes.
-      		if (idIsString) {
-      			var selectedNodes = widgetElement.val().match(/\([a-z 0-9 _]+\)/g);
-      		}
-      		else {
-      			var selectedNodes = widgetElement.val().match(/\((\d+)\)/g);
-      		}
-      		
-      		if (selectedNodes) {
-      		// Pick up nodes id.
-        		for (var i = 0; i < selectedNodes.length; i++) {
-        			// Remove the round brackets.
-        			if (idIsString) {
-        				selectedNodes[i] = selectedNodes[i].slice(1, selectedNodes[i].length -1);
-        			}
-        			else {
-        				selectedNodes[i] = parseInt(selectedNodes[i].slice(1, selectedNodes[i].length -1), 10);
-        			}
-        			
-        		}   
-      		}
-      		else {
-      			selectedNodes = [];
-      		}
-      		// Populate the selected entities text.  
-      		$('#entity-reference-tree-selected-node').val(widgetElement.val());
-      		$('#entity-reference-tree-selected-text').text('Selected entities: ' + widgetElement.val());
-      		// Build the tree.
-      		treeContainer.jstree({ 
-        		'core' : {
-        			'data' : {
-        		    'url' : function (node) {
-        		      return Drupal.url("admin/entity_reference_tree/json/" + entityType + '/' + bundle + '?token=' + token);
-        		    },
-        		    'data' : function (node) {
-        		      return { 'id' : node.id, 'text': node.text, 'parent': node.parent, };
-        		    }
-        			},
-        			'themes': {
-        				'dots': dots === '1' ? true : false,
-        				"name": theme,
-        			}
-            },
-            "checkbox" : {
-              "three_state" : false
-            },
-            "search" : {
-            	"show_only_matches": true,
-            },
-            "plugins" : [
-              "search",
-              "changed",
-              "checkbox",
-            ]
-        	});
-      		// Initialize the selected node.
-      		treeContainer.on("loaded.jstree", function (e, data) { data.instance.select_node(selectedNodes); })
-      		// Selected event.
-      		treeContainer.on(
-              "changed.jstree", function(evt, data){
-                //selected node objects;
-              	const selectedNodes = data.selected;
-              	var r = [], selectedText;
-                for (var i = 0; i < selectedNodes.length; i++) {
-                	var node = data.instance.get_node(selectedNodes[i]);
-                	// node text escaping double quote.
-                	var nodeText = node.text.replace(/"/g, '""') + ' (' + node.id + ')';
-                	// Comma is a special character for autocomplete widge.       
-                	if (nodeText.indexOf(',') !== -1 || nodeText.indexOf("'") !== -1) {
-                		nodeText = '"' + nodeText + '"';
-                	}
-                  r.push(nodeText);
-                }
-                selectedText = r.join(', ');
-                $('#entity-reference-tree-selected-node').val(selectedText);
-                $('#entity-reference-tree-selected-text').text('Selected entities: ' + selectedText);
-                
+      $("#entity-reference-tree-wrapper", context)
+        .once("jstreeBehavior")
+        .each(function() {
+          const treeContainer = $(this);
+          const fieldEditName = $("#entity-reference-tree-widget-field").val();
+          const widgetElement = $("#" + fieldEditName);
+          const theme = treeContainer.attr("theme");
+          const dots = treeContainer.attr("dots");
+          // Avoid ajax callback from running following codes again.
+          if (widgetElement.length) {
+            const entityType = $("#entity-reference-tree-entity-type").val();
+            const bundle = $("#entity-reference-tree-entity-bundle").val();
+            const token = settings["entity_tree_token_" + fieldEditName];
+            const idIsString = bundle === "*";
+            let selectedNodes;
+            // Selected nodes.
+            if (idIsString) {
+              selectedNodes = widgetElement.val().match(/\([a-z 0-9 _]+\)/g);
+            } else {
+              selectedNodes = widgetElement.val().match(/\((\d+)\)/g);
             }
-          );
-        	// Search filter box.
-        	 var to = false;
-           $('#entity-reference-tree-search').keyup(function () {
-          	 var searchInput = $(this)
-             if(to) {
-            	 clearTimeout(to); 
-             }
-             to = setTimeout(
-            		 function () {
-                   var v = searchInput.val();
-                   treeContainer.
-                   jstree(true).
-                   search(v);
-                 },
-                 250);
-             });
-    		}
-    	});
+
+            if (selectedNodes) {
+              // Pick up nodes id.
+              for (let i = 0; i < selectedNodes.length; i++) {
+                // Remove the round brackets.
+                if (idIsString) {
+                  selectedNodes[i] = selectedNodes[i].slice(
+                    1,
+                    selectedNodes[i].length - 1
+                  );
+                } else {
+                  selectedNodes[i] = parseInt(
+                    selectedNodes[i].slice(1, selectedNodes[i].length - 1),
+                    10
+                  );
+                }
+              }
+            } else {
+              selectedNodes = [];
+            }
+            // Populate the selected entities text.
+            $("#entity-reference-tree-selected-node").val(widgetElement.val());
+            $("#entity-reference-tree-selected-text").text(
+              "Selected entities: " + widgetElement.val()
+            );
+            // Build the tree.
+            treeContainer.jstree({
+              core: {
+                data: {
+                  url: function(node) {
+                    return Drupal.url(
+                      "admin/entity_reference_tree/json/" +
+                        entityType +
+                        "/" +
+                        bundle +
+                        "?token=" +
+                        token
+                    );
+                  },
+                  data: function(node) {
+                    return {
+                      id: node.id,
+                      text: node.text,
+                      parent: node.parent
+                    };
+                  }
+                },
+                themes: {
+                  dots: dots === "1",
+                  name: theme
+                }
+              },
+              checkbox: {
+                three_state: false
+              },
+              search: {
+                show_only_matches: true
+              },
+              plugins: ["search", "changed", "checkbox"]
+            });
+            // Initialize the selected node.
+            treeContainer.on("loaded.jstree", function(e, data) {
+              data.instance.select_node(selectedNodes);
+            });
+            // Selected event.
+            treeContainer.on("changed.jstree", function(evt, data) {
+              // selected node objects;
+              const choosedNodes = data.selected;
+              const r = [];
+
+              for (let i = 0; i < choosedNodes.length; i++) {
+                const node = data.instance.get_node(choosedNodes[i]);
+                // node text escaping double quote.
+                let nodeText =
+                  node.text.replace(/"/g, '""') + " (" + node.id + ")";
+                // Comma is a special character for autocomplete widge.
+                if (
+                  nodeText.indexOf(",") !== -1 ||
+                  nodeText.indexOf("'") !== -1
+                ) {
+                  nodeText = '"' + nodeText + '"';
+                }
+                r.push(nodeText);
+              }
+              const selectedText = r.join(", ");
+              $("#entity-reference-tree-selected-node").val(selectedText);
+              $("#entity-reference-tree-selected-text").text(
+                "Selected entities: " + selectedText
+              );
+            });
+            // Search filter box.
+            let to = false;
+            $("#entity-reference-tree-search").keyup(function() {
+              const searchInput = $(this);
+              if (to) {
+                clearTimeout(to);
+              }
+              to = setTimeout(function() {
+                const v = searchInput.val();
+                treeContainer.jstree(true).search(v);
+              }, 250);
+            });
+          }
+        });
     }
-  }
+  };
 })(jQuery, Drupal);
 
 // Codes just run once the DOM has loaded.
 // @See https://www.drupal.org/docs/8/api/javascript-api/javascript-api-overview
-(function($)
-		{
-		  //argument passed from InvokeCommand
-		  $.fn.entitySearchDialogAjaxCallback = function(field_edit_id, selected_entities)
-		  {
-		  	if ($('#' + field_edit_id).length) {
-	    		// submitted entity ids.
-		  		$('#' + field_edit_id).val(selected_entities);
-	    	}
-		  };
+(function($) {
+	// Search form sumbit function.
+  // Argument passed from InvokeCommand defined in Drupal\entity_reference_tree\Form\SearchForm
+  $.fn.entitySearchDialogAjaxCallback = function(fieldEditID, selectedEntites) {
+    if ($("#" + fieldEditID).length) {
+      // submitted entity ids.
+      $("#" + fieldEditID).val(selectedEntites);
+    }
+  };
 })(jQuery);
