@@ -34,7 +34,7 @@ class EntityTreeBuilder implements TreeBuilderInterface {
    */
   public function loadTree(string $entityType, string $bundleID, int $parent = 0, int $max_depth = NULL) {
     if ($this->hasAccess()) {
-      if ($bundleID === $entityType) {
+      if ($bundleID === '*') {
         // Load all entities regardless bundles.
         $entities = \Drupal::entityTypeManager()->getStorage($entityType)->loadMultiple();
         $hasBundle = FALSE;

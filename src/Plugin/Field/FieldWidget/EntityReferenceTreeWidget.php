@@ -35,7 +35,7 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
     $str_target_type = $arr_element['target_id']['#target_type'];
     
     if (empty($arr_target)) {
-      $str_target = $str_target_type;
+      $str_target = '*';
     }
     else
     {

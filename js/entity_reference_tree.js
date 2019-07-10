@@ -19,13 +19,26 @@
       		const entityType = $('#entity-reference-tree-entity-type').val();
       		const bundle = $('#entity-reference-tree-entity-bundle').val();
       		const token = settings['entity_tree_token_' + fieldEditName];
+      		const idIsString = (bundle === '*');
        		// Selected nodes.
-      		var selectedNodes = widgetElement.val().match(/\((\d+)\)/g);
+      		if (idIsString) {
+      			var selectedNodes = widgetElement.val().match(/\([a-z 0-9 _]+\)/g);
+      		}
+      		else {
+      			var selectedNodes = widgetElement.val().match(/\((\d+)\)/g);
+      		}
+      		
       		if (selectedNodes) {
       		// Pick up nodes id.
         		for (var i = 0; i < selectedNodes.length; i++) {
         			// Remove the round brackets.
-        			selectedNodes[i] = parseInt(selectedNodes[i].slice(1, selectedNodes[i].length -1), 10);
+        			if (idIsString) {
+        				selectedNodes[i] = selectedNodes[i].slice(1, selectedNodes[i].length -1);
+        			}
+        			else {
+        				selectedNodes[i] = parseInt(selectedNodes[i].slice(1, selectedNodes[i].length -1), 10);
+        			}
+        			
         		}   
       		}
       		else {
