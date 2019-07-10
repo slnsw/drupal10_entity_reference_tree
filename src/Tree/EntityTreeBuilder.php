@@ -34,33 +34,43 @@ class EntityTreeBuilder implements TreeBuilderInterface {
    */
   public function loadTree(string $entityType, string $bundleID, int $parent = 0, int $max_depth = NULL) {
     if ($this->hasAccess()) {
-      $tree = [
-        (object) [
-          'id' => $bundleID,
-      // Required.
-          'parent' => '#',
-      // Node text.
-          'text' => $bundleID,
-        ],
-      ];
-
-      // Load the next release node.
-      $eids = \Drupal::entityQuery($entityType)
+      if ($bundleID === $entityType) {
+        // Load all entities regardless bundles.
+        $entities = \Drupal::entityTypeManager()->getStorage($entityType)->loadMultiple();
+        $hasBundle = FALSE;
+      }
+      else {
+        $hasBundle = TRUE;
+        // Build the tree node for the bundle.
+        $tree = [
+            (object) [
+                'id' => $bundleID,
+                // Required.
+                'parent' => '#',
+                // Node text.
+                'text' => $bundleID,
+            ],
+        ];
+        
+        // Load all entity id within a bundle.
+        $eids = \Drupal::entityQuery($entityType)
         ->condition('type', $bundleID)
         ->execute();
-      // No entity found.
-      if (empty($eids)) {
-        return $tree;
+        // No entity found.
+        if (empty($eids)) {
+          return $tree;
+        }
+        
+        // Load all entities matched the conditions.
+        $entities = \Drupal::entityTypeManager()->getStorage($entityType)->loadMultiple($eids);
       }
-
-      // Load all entities matched the conditions.
-      $entities = \Drupal::entityTypeManager()->getStorage($entityType)->loadMultiple($eids);
-      // Find the node whose release date is just next to the current one.
+      
+      // Buld the tree.
       foreach ($entities as $entity) {
         $tree[] = (object) [
           'id' => $entity->id(),
         // Required.
-          'parent' => $entity->bundle(),
+          'parent' => $hasBundle ? $entity->bundle() : '#',
         // Node text.
           'text' => $entity->label(),
         ];

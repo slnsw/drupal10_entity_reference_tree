@@ -32,9 +32,16 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
     $form['#attached']['library'][] = 'entity_reference_tree/widget';
 
     $arr_target = $arr_element['target_id']['#selection_settings']['target_bundles'];
-
-    $str_target = implode(',', $arr_target);
     $str_target_type = $arr_element['target_id']['#target_type'];
+    
+    if (empty($arr_target)) {
+      $str_target = $str_target_type;
+    }
+    else
+    {
+      $str_target = implode(',', $arr_target);
+    }
+    
     $edit_id = 'edit-' . str_replace('_', '-', $items->getName()) . '-target-id';
 
     $arr_element['target_id']['#id'] = $edit_id;
