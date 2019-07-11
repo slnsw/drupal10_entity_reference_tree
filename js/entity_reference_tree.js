@@ -22,6 +22,7 @@
             const bundle = $("#entity-reference-tree-entity-bundle").val();
             const token = settings["entity_tree_token_" + fieldEditName];
             const idIsString = bundle === "*";
+            const limit = parseInt(settings["tree_limit_" + fieldEditName]);
             let selectedNodes;
             // Selected nodes.
             if (idIsString) {
@@ -87,7 +88,17 @@
               search: {
                 show_only_matches: true
               },
-              plugins: ["search", "changed", "checkbox"]
+              conditionalselect : function (node, event) {
+              	if (limit > 0) {
+              		return this.get_selected().length < limit || node.state.selected;
+              	}
+              	else {
+              		// No limit.
+              		return true;
+              	}
+                
+              },
+              plugins: ["search", "changed", "checkbox", "conditionalselect"]
             });
             // Initialize the selected node.
             treeContainer.on("loaded.jstree", function(e, data) {

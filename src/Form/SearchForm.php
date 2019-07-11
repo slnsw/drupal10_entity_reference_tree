@@ -42,6 +42,8 @@ class SearchForm extends FormBase {
     if (!empty($form_state->getValues())) {
       return [];
     }
+    // Limit number of selected nodes of tree.
+    $limit = $this->getRequest()->get('limit');
 
     // The status messages that will contain any form errors.
     $form['status_messages'] = [
@@ -162,6 +164,7 @@ class SearchForm extends FormBase {
     // Pass data to js file.
     $form['#attached']['drupalSettings'] = [
         'entity_tree_token_' . $field_edit_id => \Drupal::csrfToken()->get($bundles),
+        'tree_limit_' . $field_edit_id => empty($limit) ? -1 : $limit, 
     ];
 
     return $form;

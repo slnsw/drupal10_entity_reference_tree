@@ -27,10 +27,8 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
 
     $arr_element = parent::formElement($items, $delta, $element, $form, $form_state);
-
     $form['#attached']['library'][] = 'core/drupal.dialog.ajax';
     $form['#attached']['library'][] = 'entity_reference_tree/widget';
-
     $arr_target = $arr_element['target_id']['#selection_settings']['target_bundles'];
     $str_target_type = $arr_element['target_id']['#target_type'];
     
@@ -59,6 +57,7 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
             'entity_type' => $str_target_type,
             'theme' => $this->getSetting('theme'),
             'dots' => $this->getSetting('dots'),
+            'limit' => $this->fieldDefinition->getFieldStorageDefinition()->getCardinality(),
           ]),
       '#attributes' => [
         'class' => [
