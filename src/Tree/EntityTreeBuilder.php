@@ -51,18 +51,14 @@ class EntityTreeBuilder implements TreeBuilderInterface {
                 'text' => $bundleID,
             ],
         ];
-        
-        // Load all entity id within a bundle.
-        $eids = \Drupal::entityQuery($entityType)
-        ->condition('type', $bundleID)
-        ->execute();
-        // No entity found.
-        if (empty($eids)) {
-          return $tree;
-        }
-        
+        // The bundle field of node calls 'type'.
+        $bundleName = ($entityType === 'node') ? 'type' : 'bundle';
+        // Entity query properties.
+        $properties = [
+          $bundleName => $bundleID,
+        ];
         // Load all entities matched the conditions.
-        $entities = \Drupal::entityTypeManager()->getStorage($entityType)->loadMultiple($eids);
+        $entities = \Drupal::entityTypeManager()->getStorage($entityType)->loadByProperties($properties);
       }
       
       // Buld the tree.
