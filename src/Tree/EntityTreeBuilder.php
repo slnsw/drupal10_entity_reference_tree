@@ -41,6 +41,7 @@ class EntityTreeBuilder implements TreeBuilderInterface {
       }
       else {
         $hasBundle = TRUE;
+        $entityStorage = \Drupal::entityTypeManager()->getStorage($entityType);
         // Build the tree node for the bundle.
         $tree = [
             (object) [
@@ -51,14 +52,13 @@ class EntityTreeBuilder implements TreeBuilderInterface {
                 'text' => $bundleID,
             ],
         ];
-        // The bundle field of node calls 'type'.
-        $bundleName = ($entityType === 'node') ? 'type' : 'bundle';
         // Entity query properties.
         $properties = [
-          $bundleName => $bundleID,
+            // Bundle key field.
+            $entityStorage->getEntityType()->getKey('bundle') => $bundleID,
         ];
         // Load all entities matched the conditions.
-        $entities = \Drupal::entityTypeManager()->getStorage($entityType)->loadByProperties($properties);
+        $entities = $entityStorage->loadByProperties($properties);
       }
       
       // Buld the tree.
