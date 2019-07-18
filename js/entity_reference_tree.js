@@ -101,8 +101,10 @@
               plugins: ["search", "changed", "checkbox", "conditionalselect"]
             });
             // Initialize the selected node.
-            treeContainer.on("loaded.jstree", function(e, data) {
+            treeContainer.on("ready.jstree", function(e, data) {
               data.instance.select_node(selectedNodes);
+              // Make modal window height scaled automatically.
+              $("#drupal-modal").dialog( "option", { height: 'auto' } );
             });
             // Selected event.
             treeContainer.on("changed.jstree", function(evt, data) {
