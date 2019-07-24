@@ -158,7 +158,7 @@
   $.fn.entitySearchDialogAjaxCallback = function(fieldEditID, selectedEntites) {
     if ($("#" + fieldEditID).length) {
       // submitted entity ids.
-      $("#" + fieldEditID).val(selectedEntites);
+      $("#" + fieldEditID).val(selectedEntites).trigger('change');
     }
   };
 })(jQuery);
