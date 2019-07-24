@@ -31,7 +31,7 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
     $form['#attached']['library'][] = 'entity_reference_tree/widget';
     $arr_target = $arr_element['target_id']['#selection_settings']['target_bundles'];
     $str_target_type = $arr_element['target_id']['#target_type'];
-    
+    // Target bundle of the entity tree.
     if (empty($arr_target)) {
       $str_target = '*';
     }
@@ -39,16 +39,26 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
     {
       $str_target = implode(',', $arr_target);
     }
-    
+    // The id of autocomple text field.
     $edit_id = 'edit-' . str_replace('_', '-', $items->getName()) . '-target-id';
 
     $arr_element['target_id']['#id'] = $edit_id;
     $arr_element['target_id']['#tags'] = TRUE;
     $arr_element['target_id']['#default_value'] = $items->referencedEntities();
 
+    $label = $this->getSetting('label');
+    if (!$label) {
+      $label = $this->t('@label tree', [
+        '@label' => ucfirst(str_replace('_', ' ', $str_target_type)),
+      ]);
+    }
+    else {
+      $label = $this->t('@label', ['@label' => $label]);
+    }
+
     $arr_element['dialog_link'] = [
       '#type' => 'link',
-        '#title' => $this->t(ucfirst(str_replace('_', ' ', $str_target_type)) . ' tree'),
+      '#title' => $label,
       '#url' => Url::fromRoute(
           'entity_reference_tree.widget_form',
           [
@@ -76,7 +86,7 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     return $values['target_id'];
   }
-  
+
   /**
    * {@inheritdoc}
    */
@@ -86,14 +96,17 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
         'theme' => 'default',
         // Using dot line.
         'dots' => 0,
+        // Button label.
+        'label' => '',
     ] + parent::defaultSettings();
   }
-  
+
   /**
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element = [];
+    // JsTRee theme.
     $element['theme'] = [
         '#type' => 'radios',
         '#title' => t('JsTree theme'),
@@ -104,9 +117,9 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
             ->t('Default'),
             'default-dark' => $this
             ->t('Default Dark'),
-        ), 
+        ),
     ];
-    
+    // Tree dot.
     $element['dots'] = [
         '#type' => 'radios',
         '#title' => t('Dot line'),
@@ -118,18 +131,27 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
             ->t('Yes'),
         ),
     ];
-    
-    
+    // Button label.
+    $element['label'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Button label'),
+      '#default_value' => $this->getSetting('label'),
+    ];
+
     return $element;
   }
-  
+
   /**
    * {@inheritdoc}
    */
   public function settingsSummary() {
     $summary = [];
-    
+    // JsTree theme.
     $summary[] = t('JsTree theme: @theme', array('@theme' => $this->getSetting('theme')));
+    // Button label.
+    if ($label = $this->getSetting('label')) {
+      $summary[] = t('Button label: @label', ['@label' => $label]);
+    }
     
     return $summary;
   }
