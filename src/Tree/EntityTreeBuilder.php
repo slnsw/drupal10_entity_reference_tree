@@ -16,7 +16,10 @@ class EntityTreeBuilder implements TreeBuilderInterface {
   /**
    *
    * @var string
-   *   The permission name to access the tree.
+   *   The permission name to access the entity tree.
+   *   The entity storage load function is actually responsible for
+   *   the permission checking for each individual entity.
+   *   So here just use a very weak permission.
    */
   private $accessPermission = 'access content';
 

@@ -4,6 +4,7 @@ entity_reference_tree.widget_form:
     _title: 'Entity Reference Search'
     _controller: '\Drupal\entity_reference_tree\Controller\EntityReferenceTreeController::openSearchForm'
   requirements:
+    # The search form is widly open to everyone as it just an entry for search.
     _access: 'TRUE'
   options:
     _admin_route: TRUE
@@ -14,6 +15,8 @@ entity_reference_tree.json:
     _title: 'Entity Reference Search'
     _controller: '\Drupal\entity_reference_tree\Controller\EntityReferenceTreeController::treeJson'
   requirements:
+    # The access token and permission to the entity tree will be checked in the treeJson()
+    # according to the entity type and bundles.
     _access: 'TRUE'
   options:
     _admin_route: TRUE
