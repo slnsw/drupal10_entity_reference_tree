@@ -39,8 +39,21 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
     {
       $str_target = implode(',', $arr_target);
     }
-    // The id of autocomple text field.
-    $edit_id = 'edit-' . str_replace('_', '-', $items->getName()) . '-target-id';
+
+    //The id of the autocomplete text field.
+    //To ensure unqiueness when being used within Paragraph entities
+    //add the ids of any parent elements as a prefix to the the
+    //edit id.
+    $parents = $element['#field_parents'];
+    $id_prefix = '';
+    if (!empty($parents)) {
+      //Empty check necessary because implode will return the
+      //separator when given an empty array.
+      $id_prefix = str_replace('_', '-', implode('-', array_merge($parents))) . '-';
+    }
+
+    //Including the delta in the id to follow the Entity Reference module's convention.
+    $edit_id = 'edit-' . $id_prefix . str_replace('_', '-', $items->getName()) . '-' . $delta . '-target-id';
 
     $arr_element['target_id']['#id'] = $edit_id;
     $arr_element['target_id']['#tags'] = TRUE;
