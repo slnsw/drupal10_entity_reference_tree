@@ -29,7 +29,7 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
     $arr_element = parent::formElement($items, $delta, $element, $form, $form_state);
     $form['#attached']['library'][] = 'core/drupal.dialog.ajax';
     $form['#attached']['library'][] = 'entity_reference_tree/widget';
-    $arr_target = $arr_element['target_id']['#selection_settings']['target_bundles'];
+    $arr_target = empty($arr_element['target_id']['#selection_settings']['target_bundles']) ? [] : $arr_element['target_id']['#selection_settings']['target_bundles'];
     $str_target_type = $arr_element['target_id']['#target_type'];
     // Target bundle of the entity tree.
     if (empty($arr_target)) {
