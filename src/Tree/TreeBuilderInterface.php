@@ -21,7 +21,7 @@ interface TreeBuilderInterface {
    * @return array
    *   All entities in the entity bundle.
    */
-  public function loadTree(string $entityType, string $bundleID, int $parent = 0, int $max_depth = NULL);
+  public function loadTree(string $entityType, string $bundleID, string $langCode = NULL, int $parent = 0, int $max_depth = NULL);
 
   /**
    * Create a tree node.

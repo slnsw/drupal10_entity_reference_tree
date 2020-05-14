@@ -24,6 +24,13 @@ class EntityTreeBuilder implements TreeBuilderInterface {
   private $accessPermission = 'access content';
 
   /**
+   * The Language code.
+   *
+   * @var string
+   */
+  protected $langCode;
+
+  /**
    * Load all entities from an entity bundle for the tree.
    *
    * @param string $entityType
@@ -35,7 +42,7 @@ class EntityTreeBuilder implements TreeBuilderInterface {
    * @return array
    *   All entities in the entity bundle.
    */
-  public function loadTree(string $entityType, string $bundleID, int $parent = 0, int $max_depth = NULL) {
+  public function loadTree(string $entityType, string $bundleID, string $langCode = NULL, int $parent = 0, int $max_depth = NULL) {
     if ($this->hasAccess()) {
       if ($bundleID === '*') {
         // Load all entities regardless bundles.
