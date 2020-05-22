@@ -8,3 +8,16 @@ field.widget.settings.entity_reference_tree:
     dots:
       type: integer
       label: 'Dot line'
+    size:
+      type: integer
+      label: 'Size of URI field'
+    placeholder:
+      type: label
+      label: 'Placeholder'
+    match_operator:
+      type: string
+      label: 'Autocomplete matching'
+    match_limit:
+      type: integer
+      label: 'Maximum number of autocomplete suggestions'
+
