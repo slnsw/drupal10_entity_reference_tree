@@ -3,6 +3,7 @@
 namespace Drupal\entity_reference_tree\Tree;
 
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\taxonomy\Entity\Term;
 
 /**
  * Provides a class for building a tree from taxonomy entity.
@@ -14,11 +15,19 @@ use Drupal\Core\Session\AccountProxyInterface;
 class TaxonomyTreeBuilder implements TreeBuilderInterface {
 
   /**
+   * The permission name to access the tree.
    *
    * @var string
-   *   The permission name to access the tree.
+   *
    */
   private $accessPermission = 'access taxonomy overview';
+
+  /**
+   * The Language code.
+   *
+   * @var string
+   */
+  protected $langCode;
 
   /**
    * Load all entities from an entity bundle for the tree.
@@ -32,10 +41,20 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
    * @return array
    *   All entities in the entity bundle.
    */
-  public function loadTree(string $entityType, string $bundleID, int $parent = 0, int $max_depth = NULL) {
+  public function loadTree(string $entityType, string $bundleID, string $langCode = NULL, int $parent = 0, int $max_depth = NULL) {
+    // Setup the language code for this tree.
+    // Use current language by default.
+    if (empty($langCode)) {
+      $this->langCode = \Drupal::service('language_manager')->getCurrentLanguage()->getId();
+    }
+    else {
+      $this->langCode = $langCode;
+    }
+
     if ($this->hasAccess()) {
       return \Drupal::entityTypeManager()->getStorage($entityType)->loadTree($bundleID, $parent, $max_depth);
     }
+
     // The user is not allowed to access taxonomy overviews.
     return NULL;
   }
@@ -43,20 +62,33 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
   /**
    * Create a tree node.
    *
-   * @param $entity
+   * @param \Drupal\taxonomy\TermInterface $entity
    *   The entity for the tree node.
    *
    * @param array $selected
-   *   A anrray for all selected nodes.
+   *   An anrray for all selected nodes.
    *
    * @return array
    *   The tree node for the entity.
    */
   public function createTreeNode($entity, array $selected = []) {
     $parent = $entity->parents[0];
+    $text = $entity->name;
 
     if ($parent === '0') {
       $parent = '#';
+    }
+
+    // Compare the current language with the term's language.
+    // If the language is different,
+    // It need to be translated.
+    if ($entity->langcode !== $this->langCode) {
+      $term = Term::load($entity->tid);
+      // Get the translated content.
+      if ($term->hasTranslation($this->langCode)) {
+        $trans = $term->getTranslation($this->langCode);
+        $text = $trans->getName();
+      }
     }
 
     $node = [
@@ -65,7 +97,7 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
     // Required.
       'parent' => $parent,
     // Node text.
-      'text' => $entity->name,
+      'text' => $text,
       'state' => ['selected' => FALSE],
     ];
 
@@ -80,7 +112,7 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
   /**
    * Get the ID of a tree node.
    *
-   * @param $entity
+   * @param \Drupal\taxonomy\TermInterface $entity
    *   The entity for the tree node.
    *
    * @return string|int|null
