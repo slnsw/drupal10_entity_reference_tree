@@ -51,7 +51,7 @@ class SearchForm extends FormBase {
       '#weight' => -10,
     ];
 
-    // Selectd entity text.
+    // Selected entity text.
     $form['selected_text'] = [
         '#type' => 'html_tag',
         '#tag' => 'div',

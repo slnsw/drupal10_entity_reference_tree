@@ -71,7 +71,7 @@ class EntityTreeBuilder implements TreeBuilderInterface {
         $entities = $entityStorage->loadByProperties($properties);
       }
       
-      // Buld the tree.
+      // Build the tree.
       foreach ($entities as $entity) {
         $tree[] = (object) [
           'id' => $entity->id(),

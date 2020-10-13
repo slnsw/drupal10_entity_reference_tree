@@ -74,7 +74,7 @@
 		 */
 		search_leaves_only : false,
 		/**
-		 * If set to a function it wil be called in the instance's scope with two arguments - search string and node (where node will be every node in the structure, so use with caution).
+		 * If set to a function it will be called in the instance's scope with two arguments - search string and node (where node will be every node in the structure, so use with caution).
 		 * If the function returns a truthy value the node will be considered a match (it might not be displayed if search_only_leaves is set to true and the node is not a leaf). Default is `false`.
 		 * @name $.jstree.defaults.search.search_callback
 		 * @plugin search
