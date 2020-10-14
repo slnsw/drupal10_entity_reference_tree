@@ -74,6 +74,7 @@ class TaxonomyTreeBuilder implements TreeBuilderInterface {
   public function createTreeNode($entity, array $selected = []) {
     $parent = $entity->parents[0];
     $text = $entity->name;
+    \Drupal::moduleHandler()->alter('entity_reference_tree_create_term_node', $text, $entity);
 
     if ($parent === '0') {
       $parent = '#';
