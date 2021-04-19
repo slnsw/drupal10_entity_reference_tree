@@ -80,7 +80,8 @@
                 themes: {
                   dots: dots === "1",
                   name: theme
-                }
+                },
+                multiple: limit !== 1
               },
               checkbox: {
                 three_state: false
@@ -89,7 +90,7 @@
                 show_only_matches: true
               },
               conditionalselect : function (node, event) {
-              	if (limit > 0) {
+              	if (limit > 1) {
               		return this.get_selected().length < limit || node.state.selected;
               	}
               	else {
