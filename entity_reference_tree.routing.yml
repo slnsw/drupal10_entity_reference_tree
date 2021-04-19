@@ -1,5 +1,5 @@
 entity_reference_tree.widget_form:
-  path: '/admin/entity_reference_tree/search/{field_edit_id}/{bundle}/{entity_type}/{theme}/{dots}'
+  path: '/admin/entity_reference_tree/search/{field_edit_id}/{bundle}/{entity_type}/{theme}/{dots}/{dialog_title}'
   defaults:
     _title: 'Entity Reference Search'
     _controller: '\Drupal\entity_reference_tree\Controller\EntityReferenceTreeController::openSearchForm'

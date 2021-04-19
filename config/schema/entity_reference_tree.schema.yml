@@ -20,4 +20,6 @@ field.widget.settings.entity_reference_tree:
     match_limit:
       type: integer
       label: 'Maximum number of autocomplete suggestions'
-
+    dialog_title:
+      type: string
+      label: 'Dialog title'
