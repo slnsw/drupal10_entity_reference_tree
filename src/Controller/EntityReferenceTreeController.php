@@ -2,6 +2,7 @@
 
 namespace Drupal\entity_reference_tree\Controller;
 
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Form\FormBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -111,7 +112,10 @@ class EntityReferenceTreeController extends ControllerBase {
         // An array in JavaScript is indexed list.
         // JavaScript's array indices are always sequential
         // and start from 0.
-        $entityNodeAry[] = $treeBuilder->createTreeNode($entity);
+        $treeNode = $treeBuilder->createTreeNode($entity);
+        // Applies a very permissive XSS/HTML filter for node text.
+        $treeNode['text'] = Xss::filterAdmin($treeNode['text']);
+        $entityNodeAry[] = $treeNode;
       }
     }
 
