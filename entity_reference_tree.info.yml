@@ -2,8 +2,7 @@ name: Entity reference field tree widget
 type: module
 description: A field widget for entity reference tree
 package: Field Widget
-core: 8.x
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^8 || ^9 || ^10
 
 dependencies:
   - drupal:field

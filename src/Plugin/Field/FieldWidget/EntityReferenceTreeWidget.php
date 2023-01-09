@@ -90,6 +90,9 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
             'dots' => $this->getSetting('dots'),
             'dialog_title' => $dialog_title,
             'limit' => $this->fieldDefinition->getFieldStorageDefinition()->getCardinality(),
+            'cascade' => implode('+', array_keys(
+              array_filter($this->getSetting('cascade') ?? [])
+            )),
           ]),
       '#attributes' => [
         'class' => [
@@ -122,6 +125,8 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
         'label' => '',
         // Dialog title.
         'dialog_title' => '',
+        // Cascade.
+        'cascade' => [],
     ] + parent::defaultSettings();
   }
 
@@ -168,6 +173,19 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
       '#default_value' => $this->getSetting('dialog_title'),
     ];
 
+    $cascade = $this->getSetting('cascade') ?? [];
+    $cascade = array_keys(array_filter($cascade));
+    $element['cascade'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Cascade direction'),
+      '#options' => [
+        'up' => $this->t('Cascade up to parent'),
+        'down' => $this->t('Cascade down to children'),
+        'undetermined' => $this->t('Undetermined'),
+      ],
+      '#default_value' => $cascade,
+    ];
+
     return $element;
   }
 
@@ -185,6 +203,12 @@ class EntityReferenceTreeWidget extends EntityReferenceAutocompleteWidget {
     // Dialog title.
     if ($label = $this->getSetting('dialog_title')) {
       $summary[] = t('Dialog title: @title', ['@title' => $label]);
+    }
+    // Cascade.
+    if ($cascade = $this->getSetting('cascade')) {
+      $summary[] = t('Cascade: @cascade', [
+        '@cascade' => implode(', ', array_keys(array_filter($cascade))),
+      ]);
     }
     
     return $summary;

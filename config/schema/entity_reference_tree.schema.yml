@@ -23,3 +23,16 @@ field.widget.settings.entity_reference_tree:
     dialog_title:
       type: string
       label: 'Dialog title'
+    cascade:
+      type: mapping
+      label: 'Cascade direction'
+      mapping:
+        up:
+          type: boolean
+          label: 'Cascade up'
+        down:
+          type: boolean
+          label: 'Cascade down'
+        indeterminate:
+          type: boolean
+          label: 'Cascade indeterminate'

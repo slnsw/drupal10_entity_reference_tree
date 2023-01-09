@@ -23,6 +23,7 @@
             const token = settings["entity_tree_token_" + fieldEditName];
             const idIsString = bundle === "*";
             const limit = parseInt(settings["tree_limit_" + fieldEditName]);
+            const cascade = settings["tree_cascade_" + fieldEditName];
             let selectedNodes;
             // Selected nodes.
             if (idIsString) {
@@ -84,7 +85,8 @@
                 multiple: limit !== 1
               },
               checkbox: {
-                three_state: false
+                three_state: false,
+                cascade: cascade || ''
               },
               search: {
                 show_only_matches: true
@@ -112,6 +114,20 @@
               // selected node objects;
               const choosedNodes = data.selected;
               const r = [];
+              
+              // Cascade selection up to parents if required.
+              // @see https://github.com/vakata/jstree/issues/1029
+              if (cascade.includes('up')) {
+                choosedNodes.forEach(function (treeNodeId) {
+                  // Determine parent node IDs and append to choosedNodes.
+                  const node = data.instance.get_node(treeNodeId);
+                  (node.parents || []).forEach(function (parentNodeId) {
+                    if (!isNaN(parentNodeId)) {
+                      choosedNodes.push(parentNodeId);
+                    }
+                  });
+                });
+              }
 
               for (let i = 0; i < choosedNodes.length; i++) {
                 const node = data.instance.get_node(choosedNodes[i]);
